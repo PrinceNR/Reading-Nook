@@ -1,5 +1,4 @@
 export const SampleData = [
-
     {
         name : 'Alchemist',
         image : 'https://freepngimg.com/thumb/book/9-2-book-png.png',

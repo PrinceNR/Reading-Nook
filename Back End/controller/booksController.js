@@ -3,13 +3,46 @@ const asyncHandler = require("express-async-handler")
 
 const getAllBooks = asyncHandler( async (req, res ) =>{
     try {
-        const books = await booksModel.find({})
-        res.json(books)
+        const currentpage = parseInt(req.query.page);
+        console.log(req.query);
+        const limit = parseInt(req.query.limit);
+        const skip = (currentpage - 1) * limit;
+        const sort = parseInt(req.query.sort);
+        const query = req.query.query ? String(req.query.query) : ''
+        const searchFunction = query !== '' ? {
+        $or: [
+            { name : { $regex : query, $options : 'i'}},
+            { author : { $regex : query, $options : 'i'}},
+            { language : { $regex : query, $options : 'i'}}
+        ]}: {}
+
+
+        const result = await booksModel.aggregate([
+            {$match : searchFunction},
+            {
+                $facet : {
+                    totalCount : [{ $count : "count"}],
+                    data : [
+                        { $skip : skip },
+                        { $sort : { price : sort }},
+                        { $limit :limit }
+                    ]
+                }
+            }
+        ])
+        res.json(result[0])
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        res.status(500).json({ message: error.message }) 
     }
 });
 
+const getBook = asyncHandler( async (req, res) => {
+    const book = await booksModel.findById(req.params.id)
+    if (!book) {
+        return res.status(404).json({ message: "Book not found" })
+    }
+    res.json(book).json({ message: "Book found"})
+})
 const addBook = asyncHandler( async (req, res) => { 
     const Book = req.body
     try {
@@ -42,4 +75,4 @@ const deleteBook = asyncHandler( async (req, res) => {
 
 })
 
-module.exports = { getAllBooks, addBook, editBook, deleteBook }  
+module.exports = { getAllBooks, addBook, editBook, deleteBook ,getBook}  

@@ -1,7 +1,7 @@
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-const mainURL = "http://localhost:4001/books/";
+const mainURL = "http://localhost:4001/books";
 
 
 const initialState ={
@@ -12,8 +12,10 @@ const initialState ={
 
 export const getBooks = createAsyncThunk(
     "books/", 
-    async () => {
-        const response = await axios(`${mainURL}`)
+
+    async (data) => {
+        console.log(data);
+        const response = await axios(`${mainURL}?page=${data.page}&limit=${data.limit}&sort=${data.sort}&query=${data.query}`)
         return response.data;
     }
 )
@@ -47,8 +49,8 @@ export const updateBook = createAsyncThunk(
             .addCase(getBooks.fulfilled, (state, action) => {
                 state.status = "success"
                 console.log(action.payload);
-                state.books = action.payload;
-                state.count = action.payload.length
+                state.books = action.payload.data;
+                state.count = action.payload.totalCount[0].count
             })
             .addCase(getBooks.rejected, (state, action) => {
                 state.status = 'error'

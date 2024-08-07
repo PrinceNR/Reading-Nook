@@ -1,8 +1,20 @@
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import './Card.css'
+import { useDispatch } from 'react-redux';
+import { addToCart, removeFromCart } from '../store/cartSlice';
 
-function Cards({book, index}) {
+
+
+function Cards({book, index, value}) {
+
+  const dispatch = useDispatch();
+  const handleClick = () => {
+    dispatch(value? addToCart(book) : removeFromCart(book.id));
+  }
+   
+
+
   return (
     <Card key={index} style={{ width: '18rem' }}>
       <Card.Img variant="top" className='card-image' src={book.image} />
@@ -26,8 +38,10 @@ function Cards({book, index}) {
           {
             book.description
           }
-        </Card.Text>
-        <Button variant="primary">Add to Cart</Button>
+        </Card.Text>{
+          value ? <Button variant="primary" onClick={handleClick}>Add to Cart</Button> : <Button variant="danger">Remove to Cart</Button>
+        }
+        
       </Card.Body>
     </Card>
   );

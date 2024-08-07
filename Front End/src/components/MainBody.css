@@ -289,6 +289,9 @@ tbody{
 .active {
   display: flex;
 }
+.btn-active {
+  background: #2B3674;
+}
 .small-popup a i{
     font-size: 17px;
     color: #8b95b7;
@@ -596,7 +599,6 @@ tbody{
   #totalLength{
     font-size: 20px;
   }
-
   .model, .overlay {
     width: 100vw;
     height: 100vh;
