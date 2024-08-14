@@ -3,9 +3,7 @@ const admin = require('../model/admin.model');
 const asyncHandler = require('express-async-handler')
 
 const validateToken = asyncHandler( async(req, res, next) => {
-    console.log(req.cookies);
     let token = req.cookies.token
-    console.log(token);
     if (!token) {
         return res.status(401).json({ message: 'No token, authorization denied, redirecting to signin'});
     }
@@ -17,13 +15,10 @@ const validateToken = asyncHandler( async(req, res, next) => {
         console.error(error);
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ message: 'Token validation not successfull' });
-            
         }
         else{
             return res.status(401).json({ message: 'Invalid Token' });
         }
-        
-        
     }
 
 })

@@ -4,7 +4,8 @@ const {createAdmin, loginAdmin, logOutAdmin } = require('../controller/admin.con
 
 
 router.post('/create', createAdmin)
-router.get('/login', loginAdmin)
+router.post('/login', loginAdmin)
 router.get('/logout', logOutAdmin);
 
 module.exports = router;
+ 

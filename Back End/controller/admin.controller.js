@@ -5,11 +5,14 @@ const bcrypt = require("bcrypt")
 
 
 const createAdmin = asyncHandler (async(req, res) => {
+
     const { name, email, password } = req.body;
-    const user = await admin.findOne({ email });
+    const user = await admin.findOne({ email: email });
+    
+    
 
     if (user) {
-        return res.status(400).json({ message: 'Admin already exists' });
+        return res.status(400).json({ message: 'Email already exists' });
     }
     try{
         const hashedPassward = await bcrypt.hash(password , 10 )
@@ -18,40 +21,45 @@ const createAdmin = asyncHandler (async(req, res) => {
             res.status(200).json({ message: 'admin created successfully' });
         }
 
-    }catch(err)
+    }catch(err) 
     {
-        res.status(500).json({ message: err.message })
+        console.error("Error creating admin:", err);
+        res.status(500).json({ message: err.message }) 
     }
-})
+}) 
 
 const loginAdmin = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    const availableAdmin = await admin.findOne({ email })
+    
+    const availableAdmin = await admin.findOne({ email:email })
+    
     if (!availableAdmin) {
-        
         return res.status(400).json({ message: 'Invalid email or password' });
     }
     const ismatch = await bcrypt.compare( password , availableAdmin.password);
+    
     try{
         if(!ismatch) {
+            
             return res.status(400).json({ message: 'Invalid email or password' });
         }
         const accessToken = tokenCreation(availableAdmin)
-        console.log(accessToken)
-
 
         res.cookie("token", accessToken, {
             httpOnly: true,
             secure : true,
             maxAge : 3600000, // 1 hour
         })
+        res.status(200).json({
+            message : "token created successfully",
+            accessToken : accessToken,
+            admin : availableAdmin
+        })
         
     }catch(err){
         res.status(500).json({ message: err.message })
     }
-
 })
-
 const tokenCreation = (data) => {
     const payload = {
         username : data.name,
